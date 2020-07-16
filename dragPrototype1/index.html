@@ -57,22 +57,23 @@
 
     let originColumn = columns[0];
     let currentColumn = columns[1];
-
-    console.log(parent);
-    console.log(columns);
-    console.log(cards);
-
-    
+   
     function mouseDownCallBack(e) {
+
         e.preventDefault();
+
         const cardElement = this;
         const movingCardElement = cardElement.cloneNode(cardElement);
         cardElement.style.opacity = "0.5";
-        console.log(movingCardElement);
+
+        const startX = e.pageX;
+        const startY = e.pageY;
 
         movingCardElement.style.position = "absolute";
-        movingCardElement.style.left = e.clientX + "px";
-        movingCardElement.style.top = e.clientY + "px";
+        let rect = cardElement.getBoundingClientRect();
+
+        movingCardElement.style.left = startX - (e.clientX - rect.left) + "px";
+        movingCardElement.style.top = startY - (e.clientY - rect.top) + "px";
 
         const parentElement = this.parentElement;
         parent.appendChild(movingCardElement);
@@ -80,8 +81,6 @@
         originColumn = parentElement;
         currentColumn = parentElement;
 
-        const startX = e.clientX;
-        const startY = e.clientY;
 
         function moveCallBack(e) {
             e.preventDefault();
@@ -109,9 +108,9 @@
                 }
             }
 
-            movingCardElement.style.left = e.clientX + "px";
-            movingCardElement.style.top = e.clientY + "px";
-            // movingCardElement.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
+            // movingCardElement.style.left = e.pageX + "px";
+            // movingCardElement.style.top = e.pageY + "px";
+            movingCardElement.style.transform = `translate(${e.pageX - startX}px, ${e.pageY - startY}px)`;
         };
  
         document.addEventListener('mousemove', moveCallBack);
