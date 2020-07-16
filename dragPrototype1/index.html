@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent {
+            display: flex;
+        }
+        .column {
+            width:300px;
+            outline : 1px solid black;
+            height:800px;
+        }
+        .card {
+            box-sizing: border-box;
+            width:300px;
+            padding:10px;
+            outline: 1px solid black;
+            color : white;
+            background-color: brown;
+        }
+    </style>
+</head>
+<body>
+    <div class="parent">
+        <div class="column">
+            <div class="card">123123</div>
+            <div class="card">234234234</div>
+            <div class="card">345345345</div>
+            <div class="card">39486309j</div>
+        </div>
+        <div class="column">
+            
+        </div>
+        <div class="column">
+            
+        </div>
+    </div>
+</body>
+<script>
+    // 테스트 용으로 짠 것이기 때문에 깔끔하지 않습니다.
+    // 그냥 파일을 열어도 되고, 아니면 커맨드창에 live-server라고 해도 됩니다.
+
+    const $ = selector => {
+        const result = document.querySelectorAll(selector);
+        if(result.length < 2) return result[0];
+        return result;
+    };
+
+    const log = console.log;
+
+    const parent = $(".parent");
+    const columns = $(".column");
+    const cards = $(".card");
+
+    let originColumn = columns[0];
+    let currentColumn = columns[1];
+
+    console.log(parent);
+    console.log(columns);
+    console.log(cards);
+
+    
+    function mouseDownCallBack(e) {
+        const cardElement = this;
+        const movingCardElement = cardElement.cloneNode(cardElement);
+        cardElement.style.opacity = "0.5";
+        console.log(movingCardElement);
+
+        movingCardElement.style.position = "absolute";
+        movingCardElement.style.left = e.clientX + "px";
+        movingCardElement.style.top = e.clientY + "px";
+
+        const parentElement = this.parentElement;
+        parent.appendChild(movingCardElement);
+        
+        originColumn = parentElement;
+        currentColumn = parentElement;
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+
+        function moveCallBack(e) {
+            e.preventDefault();
+            const clientX = e.clientX;
+            const clientY = e.clientY; 
+            const currentPositionElements = document.elementsFromPoint(clientX, clientY);
+
+            const changeCards = currentPositionElements.filter(element => [].includes.call(cards, element));
+            const currentColumn = [].find.call(columns, one => currentPositionElements.includes(one));
+
+            log(currentPositionElements);
+            if(changeCards.length == 0) {
+                // 영역 밖을 나가는 것도 있기 때문에 currenColumn을 체크해줘야 한다.
+                if(currentColumn) {
+                    const targetElement = currentColumn;
+                    targetElement.insertAdjacentElement('beforeend', cardElement);
+                }
+            }
+            else if(changeCards.length == 1) {
+                const targetElement = changeCards[0];
+                if(targetElement.previousElementSibling === cardElement) {
+                    targetElement.insertAdjacentElement('afterend', cardElement);
+                } else {
+                    targetElement.insertAdjacentElement('beforebegin', cardElement);
+                }
+            }
+
+            movingCardElement.style.left = e.clientX + "px";
+            movingCardElement.style.top = e.clientY + "px";
+            // movingCardElement.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
+        };
+ 
+        document.addEventListener('mousemove', moveCallBack);
+
+        document.addEventListener('mouseup', function aa(e) { 
+            const elements = document.elementsFromPoint(e.clientX, e.clientY);
+            const currentColumn = [].find.call(columns, one => elements.includes(one));
+
+            cardElement.style.opacity = '1';
+            cardElement.style.transform = `translate(0px, 0px)`;
+            parent.removeChild(movingCardElement);
+
+            document.removeEventListener('mousemove', moveCallBack);
+            document.removeEventListener('mouseup', aa);
+        }); 
+    }
+    
+    function setCurrentColumn(e) {
+        currentColumn = this;
+    }
+    columns[0].addEventListener('mouseenter', setCurrentColumn);
+    columns[1].addEventListener('mouseenter', setCurrentColumn);
+    columns[2].addEventListener('mouseenter', setCurrentColumn);
+
+    cards[0].addEventListener('mousedown', mouseDownCallBack);
+    cards[1].addEventListener('mousedown', mouseDownCallBack);
+    cards[2].addEventListener('mousedown', mouseDownCallBack);
+    cards[3].addEventListener('mousedown', mouseDownCallBack);
+    
+</script>
+</html>
