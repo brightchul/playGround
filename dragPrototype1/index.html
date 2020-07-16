@@ -107,9 +107,6 @@
                     targetElement.insertAdjacentElement('beforebegin', cardElement);
                 }
             }
-
-            // movingCardElement.style.left = e.pageX + "px";
-            // movingCardElement.style.top = e.pageY + "px";
             movingCardElement.style.transform = `translate(${e.pageX - startX}px, ${e.pageY - startY}px)`;
         };
  
@@ -129,13 +126,6 @@
             document.removeEventListener('mouseup', aa);
         }); 
     }
-    
-    function setCurrentColumn(e) {
-        currentColumn = this;
-    }
-    columns[0].addEventListener('mouseenter', setCurrentColumn);
-    columns[1].addEventListener('mouseenter', setCurrentColumn);
-    columns[2].addEventListener('mouseenter', setCurrentColumn);
 
     cards[0].addEventListener('mousedown', mouseDownCallBack);
     cards[1].addEventListener('mousedown', mouseDownCallBack);
