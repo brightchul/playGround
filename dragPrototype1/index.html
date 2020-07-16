@@ -64,6 +64,7 @@
 
     
     function mouseDownCallBack(e) {
+        e.preventDefault();
         const cardElement = this;
         const movingCardElement = cardElement.cloneNode(cardElement);
         cardElement.style.opacity = "0.5";
@@ -116,6 +117,8 @@
         document.addEventListener('mousemove', moveCallBack);
 
         document.addEventListener('mouseup', function aa(e) { 
+            e.preventDefault();
+
             const elements = document.elementsFromPoint(e.clientX, e.clientY);
             const currentColumn = [].find.call(columns, one => elements.includes(one));
 
