@@ -1,13 +1,13 @@
-const WIDTH = 1000;
-const HEIGHT = 1500;
-const circleCount = 10;
+const WIDTH = 2000;
+const HEIGHT = 1000;
+const circleCount = 10000;
 const FFF = 16777215;
-const GRID_VALUE = 100;
+const GRID_VALUE = 200;
 const POS_X = 0;
 const POS_Y = 0;
 const CANVAS_BACKGROUND_COLOR = "#eee";
-const RADIUS_MIN = 10;
-const RADIUS_MAX = 30;
+const RADIUS_MIN = 1;
+const RADIUS_MAX = 3;
 
 const config = {
   WIDTH: 1750,
@@ -49,46 +49,43 @@ class Circle {
     if (tempYMinusR <= 0 || tempYPlusR >= HEIGHT) {
       return (this.ang = Math.PI - ang);
     }
-
-    // 각 그리드 별로 충돌 확인 용
+    const gridFlag = true;
     let collisionOne;
-    const x1 = (tempXMinusR / GRID_VALUE) | 0;
-    const x2 = (tempXPlusR / GRID_VALUE) | 0;
-    const y1 = (tempYMinusR / GRID_VALUE) | 0;
-    const y2 = (tempYPlusR / GRID_VALUE) | 0;
 
-    const xList = [x1];
-    if (x1 !== x2) xList.push(x2);
+    if (gridFlag) {
+      // 각 그리드 별로 충돌 확인 용
+      const x1 = (tempXMinusR / GRID_VALUE) | 0;
+      const x2 = (tempXPlusR / GRID_VALUE) | 0;
+      const y1 = (tempYMinusR / GRID_VALUE) | 0;
+      const y2 = (tempYPlusR / GRID_VALUE) | 0;
 
-    const yList = [y1];
-    if (y1 !== y2) yList.push(y2);
+      loop1: for (let i = x1; i <= x2; i++) {
+        for (let j = y1; j <= y2; j++) {
+          const grid = gridMap.get(`${i}-${j}`);
 
-    loop1: for (let i = 0; i < xList.length; i++) {
-      for (let j = 0; j < yList.length; j++) {
-        const grid = gridMap.get(`${xList[i]}-${yList[j]}`);
+          if (!grid) continue;
 
-        if (!grid) continue;
-
-        for (let k = 0; k < grid.length; k++) {
-          if (grid[k] === this) continue;
-          if (this.isCollision(tempX, tempY, r, grid[k])) {
-            collisionOne = grid[k];
-            break loop1;
+          for (let k = 0; k < grid.length; k++) {
+            if (grid[k] === this) continue;
+            if (this.isCollision(tempX, tempY, r, grid[k])) {
+              collisionOne = grid[k];
+              break loop1;
+            }
           }
         }
       }
+    } else {
+      // 기존 코드
+      const len = circleList.length;
+      for (let i = 0; i < len; i++) {
+        const circle = circleList[i];
+        if (this === circle) continue;
+        if (this.isCollision(this.x, this.y, this.r, circle)) {
+          collisionOne = circle;
+          break;
+        }
+      }
     }
-
-    // 기존 코드
-    // const len = circleList.length;
-    // for (let i = 0; i < len; i++) {
-    //   const circle = circleList[i];
-    //   if (this === circle) continue;
-    //   if (this.isCollision(this.x, this.y, this.r, circle)) {
-    //     collisionOne = circle;
-    //     break;
-    //   }
-    // }
 
     if (collisionOne) {
       return (this.ang = Math.PI * 2 - ang);
@@ -104,27 +101,16 @@ class Circle {
 
     const x_minus_r = ((x - r) / GRID_VALUE) | 0;
     const x_plus_r = ((x + r) / GRID_VALUE) | 0;
-
-    const xList = [x_minus_r];
-    if (x_minus_r !== x_plus_r) {
-      xList.push(x_plus_r);
-    }
-
     const y_minus_r = ((y - r) / GRID_VALUE) | 0;
     const y_plus_r = ((y + r) / GRID_VALUE) | 0;
 
-    const yList = [y_minus_r];
-    if (y_minus_r !== y_plus_r) {
-      yList.push(y_plus_r);
-    }
-
-    xList.forEach((xOne) => {
-      yList.forEach((yOne) => {
-        const key = `${xOne}-${yOne}`;
+    for (let i = x_minus_r; i <= x_plus_r; i++) {
+      for (let j = y_minus_r; j <= y_plus_r; j++) {
+        const key = `${i}-${j}`;
         if (!gridMap.has(key)) gridMap.set(key, []);
         gridMap.get(key).push(this);
-      });
-    });
+      }
+    }
   }
   isCollision(x, y, r, other) {
     return (x - other.x) ** 2 + (y - other.y) ** 2 <= (r + other.r) ** 2;
