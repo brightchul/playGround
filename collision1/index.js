@@ -1,6 +1,6 @@
 const WIDTH = 2000;
 const HEIGHT = 1000;
-const circleCount = 10000;
+const circleCount = 7000;
 const FFF = 16777215;
 const GRID_VALUE = 200;
 const POS_X = 0;
