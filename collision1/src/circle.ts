@@ -2,6 +2,9 @@ const GRID_VALUE = 200;
 const WIDTH = 2000;
 const HEIGHT = 1000;
 
+const DEGREE_180 = Math.PI;
+const DEGREE_360 = Math.PI * 2;
+
 export const gridMap: Map<string, Circle[]> = new Map();
 
 export type CircleConstructorArgs = {
@@ -11,7 +14,13 @@ export type CircleConstructorArgs = {
   v: number;
   ang: number;
   color: string;
-  ctx: CanvasRenderingContext2D;
+};
+
+export type CircleInfo = {
+  x: number;
+  y: number;
+  r: number;
+  color: string;
 };
 
 export class Circle {
@@ -21,23 +30,19 @@ export class Circle {
   v: number;
   ang: number;
   color: string;
-  ctx: CanvasRenderingContext2D;
 
-  constructor({ x, y, r, v, ang, color, ctx }: CircleConstructorArgs) {
+  constructor({ x, y, r, v, ang, color }: CircleConstructorArgs) {
     this.x = x;
     this.y = y;
     this.r = r;
     this.v = v;
     this.ang = ang;
     this.color = color;
-    this.ctx = ctx;
   }
-  render() {
-    const { x, y, r, color, ctx } = this;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
+
+  get info(): CircleInfo {
+    const { x, y, r, color } = this;
+    return { x, y, r, color };
   }
   check() {
     const tempX = this.x + this.v * Math.sin(this.ang);
@@ -51,11 +56,11 @@ export class Circle {
 
     // 캔버스 경계 충돌 확인
     if (tempXMinusR <= 0 || tempXPlusR >= WIDTH) {
-      this.ang = Math.PI * 2 - ang;
+      this.ang = DEGREE_360 - ang;
       return;
     }
     if (tempYMinusR <= 0 || tempYPlusR >= HEIGHT) {
-      this.ang = Math.PI - ang;
+      this.ang = DEGREE_180 - ang;
       return;
     }
 
