@@ -1,6 +1,4 @@
-import { generateRandomCircle } from "./util";
-
-const GRID_VALUE = 200;
+const gridValue = 200;
 const WIDTH = 2000;
 const HEIGHT = 1000;
 
@@ -70,10 +68,10 @@ export class Circle {
     let collisionOne;
 
     // 각 그리드 별로 충돌 확인 용
-    const x1 = (tempXMinusR / GRID_VALUE) | 0;
-    const x2 = (tempXPlusR / GRID_VALUE) | 0;
-    const y1 = (tempYMinusR / GRID_VALUE) | 0;
-    const y2 = (tempYPlusR / GRID_VALUE) | 0;
+    const x1 = (tempXMinusR / gridValue) | 0;
+    const x2 = (tempXPlusR / gridValue) | 0;
+    const y1 = (tempYMinusR / gridValue) | 0;
+    const y2 = (tempYPlusR / gridValue) | 0;
 
     loop: for (let i = x1; i <= x2; i++) {
       for (let j = y1; j <= y2; j++) {
@@ -107,10 +105,10 @@ export class Circle {
     this.y = nextY;
 
     // gridMap에 저장
-    const leftX = ((nextX - r) / GRID_VALUE) | 0;
-    const rightX = ((nextX + r) / GRID_VALUE) | 0;
-    const lowY = ((nextY - r) / GRID_VALUE) | 0;
-    const highY = ((nextY + r) / GRID_VALUE) | 0;
+    const leftX = ((nextX - r) / gridValue) | 0;
+    const rightX = ((nextX + r) / gridValue) | 0;
+    const lowY = ((nextY - r) / gridValue) | 0;
+    const highY = ((nextY + r) / gridValue) | 0;
 
     for (let currentX = leftX; currentX <= rightX; currentX++) {
       for (let currentY = lowY; currentY <= highY; currentY++) {
@@ -133,14 +131,14 @@ export class Circle {
 
 type CircleManagerConfig = {
   circleCount: number;
-  WIDTH: number;
-  HEIGHT: number;
-  V_VARIABLE: number;
-  V_MIN: number;
-  FFF: number;
-  RADIUS_MAX: number;
-  RADIUS_MIN: number;
-  GRID_VALUE: number;
+  width: number;
+  height: number;
+  vVariable: number;
+  vMin: number;
+  maxColor: number;
+  radiusMax: number;
+  radiusMin: number;
+  gridValue: number;
 };
 
 export class CircleManager {
@@ -155,35 +153,16 @@ export class CircleManager {
     return this.circleList;
   }
   initCirclePlace() {
-    const {
-      circleCount,
-      WIDTH,
-      HEIGHT,
-      V_VARIABLE,
-      V_MIN,
-      FFF,
-      RADIUS_MAX,
-      RADIUS_MIN,
-      GRID_VALUE,
-    } = this.config;
+    const { circleCount, gridValue } = this.config;
 
     let tempList = [];
 
     settingLoop: for (let i = 0; i < circleCount; ) {
-      const { x, y, v, ang, color, r } = generateRandomCircle(
-        WIDTH,
-        HEIGHT,
-        V_VARIABLE,
-        V_MIN,
-        FFF,
-        RADIUS_MAX,
-        RADIUS_MIN
-      );
+      const { x, y, v, ang, color, r } = this.generateRandomCircle();
+      const leftX = ((x - r) / gridValue) | 0;
+      const rightX = ((x + r) / gridValue) | 0;
 
       const circle = new Circle({ x, y, r, v, ang, color });
-
-      const leftX = ((x - r) / GRID_VALUE) | 0;
-      const rightX = ((x + r) / GRID_VALUE) | 0;
 
       for (let currentX = leftX; currentX <= rightX; currentX++) {
         if (!tempList[currentX]) {
@@ -201,5 +180,19 @@ export class CircleManager {
     }
 
     return (this.circleList = tempList.flat());
+  }
+
+  generateRandomCircle() {
+    const { width, height, vVariable, vMin, maxColor, radiusMax, radiusMin } =
+      this.config;
+
+    const r = ((Math.random() * (radiusMax - radiusMin + 1)) | 0) + radiusMin;
+    const x = ((Math.random() * (width - r - r)) | 0) + r;
+    const y = ((Math.random() * (height - r - r)) | 0) + r;
+    const v = (Math.random() * vVariable + vMin) | 0;
+    const ang = Math.random() * 6;
+    const color = `#${((Math.random() * maxColor) | 0).toString(16)}`;
+
+    return { x, y, v, ang, color, r };
   }
 }

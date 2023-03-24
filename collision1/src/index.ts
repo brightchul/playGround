@@ -24,14 +24,14 @@ const V_VARIABLE = 5;
 
 const circleManager = new CircleManager({
   circleCount,
-  WIDTH,
-  HEIGHT,
-  V_VARIABLE,
-  V_MIN,
-  FFF,
-  RADIUS_MAX,
-  RADIUS_MIN,
-  GRID_VALUE,
+  width: WIDTH,
+  height: HEIGHT,
+  vVariable: V_VARIABLE,
+  vMin: V_MIN,
+  maxColor: FFF,
+  radiusMax: RADIUS_MAX,
+  radiusMin: RADIUS_MIN,
+  gridValue: GRID_VALUE,
 });
 
 const circleList = circleManager.initCirclePlace();
