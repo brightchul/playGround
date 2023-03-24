@@ -1,3 +1,5 @@
+import { generateRandomCircle } from "./util";
+
 const GRID_VALUE = 200;
 const WIDTH = 2000;
 const HEIGHT = 1000;
@@ -45,6 +47,7 @@ export class Circle {
     return { x, y, r, color };
   }
   check() {
+    // 이동하기후의 임시 값
     const tempX = this.x + this.v * Math.sin(this.ang);
     const tempY = this.y + this.v * Math.cos(this.ang);
 
@@ -80,7 +83,7 @@ export class Circle {
 
         for (let k = 0; k < grid.length; k++) {
           if (grid[k] === this) continue;
-          if (this.isCollision(tempX, tempY, r, grid[k])) {
+          if (this.isCollision(grid[k])) {
             collisionOne = grid[k];
             break loop;
           }
@@ -89,25 +92,29 @@ export class Circle {
     }
 
     if (collisionOne) {
-      this.ang = Math.PI * 2 - ang;
+      this.ang = DEGREE_360 - ang;
     }
   }
   move() {
-    const x = this.x + this.v * Math.sin(this.ang);
-    const y = this.y + this.v * Math.cos(this.ang);
-    const r = this.r;
+    const { x, y, v, ang, r } = this;
 
-    this.x = x;
-    this.y = y;
+    // 이동
+    const nextX = x + v * Math.sin(ang);
+    const nextY = y + v * Math.cos(ang);
 
-    const x_minus_r = ((x - r) / GRID_VALUE) | 0;
-    const x_plus_r = ((x + r) / GRID_VALUE) | 0;
-    const y_minus_r = ((y - r) / GRID_VALUE) | 0;
-    const y_plus_r = ((y + r) / GRID_VALUE) | 0;
+    // 좌표 세팅
+    this.x = nextX;
+    this.y = nextY;
 
-    for (let i = x_minus_r; i <= x_plus_r; i++) {
-      for (let j = y_minus_r; j <= y_plus_r; j++) {
-        const key = `${i}-${j}`;
+    // gridMap에 저장
+    const leftX = ((nextX - r) / GRID_VALUE) | 0;
+    const rightX = ((nextX + r) / GRID_VALUE) | 0;
+    const lowY = ((nextY - r) / GRID_VALUE) | 0;
+    const highY = ((nextY + r) / GRID_VALUE) | 0;
+
+    for (let currentX = leftX; currentX <= rightX; currentX++) {
+      for (let currentY = lowY; currentY <= highY; currentY++) {
+        const key = `${currentX}-${currentY}`;
 
         if (gridMap.has(key)) {
           gridMap.get(key)!.push(this);
@@ -117,7 +124,82 @@ export class Circle {
       }
     }
   }
-  isCollision(x: number, y: number, r: number, other: Circle) {
+
+  isCollision = (other: Circle) => {
+    const { x, y, r } = this;
     return (x - other.x) ** 2 + (y - other.y) ** 2 <= (r + other.r) ** 2;
+  };
+}
+
+type CircleManagerConfig = {
+  circleCount: number;
+  WIDTH: number;
+  HEIGHT: number;
+  V_VARIABLE: number;
+  V_MIN: number;
+  FFF: number;
+  RADIUS_MAX: number;
+  RADIUS_MIN: number;
+  GRID_VALUE: number;
+};
+
+export class CircleManager {
+  circleList: Circle[];
+  config: CircleManagerConfig;
+
+  constructor(config: CircleManagerConfig) {
+    this.config = config;
+    this.circleList = [];
+  }
+  getCircleInfoList() {
+    return this.circleList;
+  }
+  initCirclePlace() {
+    const {
+      circleCount,
+      WIDTH,
+      HEIGHT,
+      V_VARIABLE,
+      V_MIN,
+      FFF,
+      RADIUS_MAX,
+      RADIUS_MIN,
+      GRID_VALUE,
+    } = this.config;
+
+    let tempList = [];
+
+    settingLoop: for (let i = 0; i < circleCount; ) {
+      const { x, y, v, ang, color, r } = generateRandomCircle(
+        WIDTH,
+        HEIGHT,
+        V_VARIABLE,
+        V_MIN,
+        FFF,
+        RADIUS_MAX,
+        RADIUS_MIN
+      );
+
+      const circle = new Circle({ x, y, r, v, ang, color });
+
+      const leftX = ((x - r) / GRID_VALUE) | 0;
+      const rightX = ((x + r) / GRID_VALUE) | 0;
+
+      for (let currentX = leftX; currentX <= rightX; currentX++) {
+        if (!tempList[currentX]) {
+          tempList[currentX] = [circle];
+          continue;
+        }
+
+        if (tempList[currentX].some(circle.isCollision)) {
+          continue settingLoop;
+        }
+
+        tempList[currentX].push(circle);
+      }
+      i++;
+    }
+
+    return (this.circleList = tempList.flat());
   }
 }
