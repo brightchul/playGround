@@ -1,3 +1,4 @@
+import { Canvas } from "./canvas";
 import { Circle, gridMap } from "./circle";
 import { generateRandomValues, isOutofCanvas } from "./util";
 
@@ -6,24 +7,18 @@ const HEIGHT = 1000;
 const circleCount = 7000;
 const FFF = 16777215;
 const GRID_VALUE = 200;
-const POS_X = 0;
-const POS_Y = 0;
 const CANVAS_BACKGROUND_COLOR = "#eee";
 const RADIUS_MIN = 1;
 const RADIUS_MAX = 3;
 
-function makeCanvas() {
-  let canvas = document.getElementById("canvas1")! as HTMLCanvasElement;
-  canvas.height = HEIGHT;
-  canvas.width = WIDTH;
-
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = CANVAS_BACKGROUND_COLOR;
-  ctx.fillRect(POS_X, POS_Y, WIDTH, HEIGHT);
-  return { canvas, ctx };
-}
-
-const { ctx } = makeCanvas();
+const canvasManager = new Canvas({
+  element: document.getElementById("container")!,
+  height: HEIGHT,
+  width: WIDTH,
+  posX: 0,
+  posY: 0,
+  bgColor: CANVAS_BACKGROUND_COLOR,
+});
 
 const V_MIN = 1;
 const V_VARIABLE = 5;
@@ -31,7 +26,7 @@ const V_VARIABLE = 5;
 function initCirclePlace() {
   let tempList = [];
 
-  setting: for (let i = 0; i < circleCount; ) {
+  settingLoop: for (let i = 0; i < circleCount; ) {
     const { x, y, v, ang, color, r } = generateRandomValues(
       WIDTH,
       HEIGHT,
@@ -46,7 +41,7 @@ function initCirclePlace() {
       continue;
     }
 
-    const circle1 = new Circle({ x, y, r, v, ang, color, ctx });
+    const circle1 = new Circle({ x, y, r, v, ang, color });
 
     const idx = ((x - r) / GRID_VALUE) | 0;
     const idx2 = ((x + r) / GRID_VALUE) | 0;
@@ -56,7 +51,7 @@ function initCirclePlace() {
         tempList[j] &&
         tempList[j].some((one) => circle1.isCollision(x, y, r, one))
       ) {
-        continue setting;
+        continue settingLoop;
       }
       if (!tempList[j]) {
         tempList[j] = [circle1];
@@ -65,12 +60,12 @@ function initCirclePlace() {
       }
     }
 
-    circle1.render();
+    canvasManager.renderCircle(circle1.info);
+
     i++;
   }
 
   const circleList = tempList.flat();
-  // const circleList = [...tempList];
 
   return circleList;
 }
@@ -78,8 +73,7 @@ function initCirclePlace() {
 const circleList = initCirclePlace();
 
 function run() {
-  ctx.fillStyle = CANVAS_BACKGROUND_COLOR;
-  ctx.fillRect(POS_X, POS_Y, WIDTH, HEIGHT);
+  canvasManager.clear();
 
   const len = circleList.length;
 
@@ -92,7 +86,7 @@ function run() {
   }
 
   for (let i = 0; i < len; i++) {
-    circleList[i].render();
+    canvasManager.renderCircle(circleList[i].info);
   }
 
   requestAnimationFrame(run);
