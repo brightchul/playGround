@@ -1,57 +1,36 @@
 import { Canvas } from "./canvas";
-import { CircleManager, gridMap } from "./circle";
+import { CircleManager } from "./circle";
 
-const WIDTH = 2000;
-const HEIGHT = 1000;
-const circleCount = 7000;
 const FFF = 16777215;
-const GRID_VALUE = 200;
-const CANVAS_BACKGROUND_COLOR = "#eee";
-const RADIUS_MIN = 1;
-const RADIUS_MAX = 3;
 
 const canvasManager = new Canvas({
   element: document.getElementById("container")!,
-  height: HEIGHT,
-  width: WIDTH,
+  height: 1000,
+  width: 2000,
   posX: 0,
   posY: 0,
-  bgColor: CANVAS_BACKGROUND_COLOR,
+  bgColor: "#eee",
 });
-
-const V_MIN = 1;
-const V_VARIABLE = 5;
 
 const circleManager = new CircleManager({
-  circleCount,
-  width: WIDTH,
-  height: HEIGHT,
-  vVariable: V_VARIABLE,
-  vMin: V_MIN,
+  circleCount: 7000,
+  width: 2000,
+  height: 1000,
+  vVariable: 5,
+  vMin: 1,
   maxColor: FFF,
-  radiusMax: RADIUS_MAX,
-  radiusMin: RADIUS_MIN,
-  gridValue: GRID_VALUE,
+  radiusMin: 1,
+  radiusMax: 3,
+  gridValue: 200,
 });
-
-const circleList = circleManager.initCirclePlace();
 
 function run() {
   canvasManager.clear();
+  circleManager.moveCircles();
 
-  const len = circleList.length;
-
-  for (let i = 0; i < len; i++) {
-    circleList[i].check();
-  }
-  gridMap.clear();
-  for (let i = 0; i < len; i++) {
-    circleList[i].move();
-  }
-
-  for (let i = 0; i < len; i++) {
-    canvasManager.renderCircle(circleList[i].info);
-  }
+  circleManager.circleList.forEach((circle) =>
+    canvasManager.renderCircle(circle.info)
+  );
 
   requestAnimationFrame(run);
 }

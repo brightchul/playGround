@@ -1,26 +1,23 @@
-const gridValue = 200;
-const WIDTH = 2000;
-const HEIGHT = 1000;
-
 const DEGREE_180 = Math.PI;
 const DEGREE_360 = Math.PI * 2;
-
-export const gridMap: Map<string, Circle[]> = new Map();
-
-export type CircleConstructorArgs = {
-  x: number;
-  y: number;
-  r: number;
-  v: number;
-  ang: number;
-  color: string;
-};
 
 export type CircleInfo = {
   x: number;
   y: number;
   r: number;
   color: string;
+};
+
+export type CircleConstructorArgs = CircleInfo & {
+  v: number;
+  ang: number;
+};
+
+type PositionInfo = {
+  leftX: number;
+  rightX: number;
+  lowY: number;
+  highY: number;
 };
 
 export class Circle {
@@ -44,57 +41,39 @@ export class Circle {
     const { x, y, r, color } = this;
     return { x, y, r, color };
   }
-  check() {
-    // 이동하기후의 임시 값
-    const tempX = this.x + this.v * Math.sin(this.ang);
-    const tempY = this.y + this.v * Math.cos(this.ang);
 
-    const { ang, r } = this;
-    const tempXMinusR = tempX - r;
-    const tempXPlusR = tempX + r;
-    const tempYMinusR = tempY - r;
-    const tempYPlusR = tempY + r;
+  reflectXAxis() {
+    this.ang = DEGREE_180 - this.ang;
+  }
+  reflectYAxis() {
+    this.ang = DEGREE_360 - this.ang;
+  }
 
-    // 캔버스 경계 충돌 확인
-    if (tempXMinusR <= 0 || tempXPlusR >= WIDTH) {
-      this.ang = DEGREE_360 - ang;
-      return;
-    }
-    if (tempYMinusR <= 0 || tempYPlusR >= HEIGHT) {
-      this.ang = DEGREE_180 - ang;
-      return;
-    }
+  getPositionInfo(): PositionInfo {
+    const { x, y, r } = this;
 
-    let collisionOne;
+    return {
+      leftX: x - r,
+      rightX: x + r,
+      lowY: y - r,
+      highY: y + r,
+    };
+  }
 
-    // 각 그리드 별로 충돌 확인 용
-    const x1 = (tempXMinusR / gridValue) | 0;
-    const x2 = (tempXPlusR / gridValue) | 0;
-    const y1 = (tempYMinusR / gridValue) | 0;
-    const y2 = (tempYPlusR / gridValue) | 0;
+  getNextPositionInfo(): PositionInfo {
+    const { ang, x, y, v, r } = this;
+    const nextX = x + v * Math.sin(ang);
+    const nextY = y + v * Math.cos(ang);
 
-    loop: for (let i = x1; i <= x2; i++) {
-      for (let j = y1; j <= y2; j++) {
-        const grid = gridMap.get(`${i}-${j}`);
-
-        if (!grid) continue;
-
-        for (let k = 0; k < grid.length; k++) {
-          if (grid[k] === this) continue;
-          if (this.isCollision(grid[k])) {
-            collisionOne = grid[k];
-            break loop;
-          }
-        }
-      }
-    }
-
-    if (collisionOne) {
-      this.ang = DEGREE_360 - ang;
-    }
+    return {
+      leftX: nextX - r,
+      rightX: nextX + r,
+      lowY: nextY - r,
+      highY: nextY + r,
+    };
   }
   move() {
-    const { x, y, v, ang, r } = this;
+    const { x, y, v, ang } = this;
 
     // 이동
     const nextX = x + v * Math.sin(ang);
@@ -103,24 +82,6 @@ export class Circle {
     // 좌표 세팅
     this.x = nextX;
     this.y = nextY;
-
-    // gridMap에 저장
-    const leftX = ((nextX - r) / gridValue) | 0;
-    const rightX = ((nextX + r) / gridValue) | 0;
-    const lowY = ((nextY - r) / gridValue) | 0;
-    const highY = ((nextY + r) / gridValue) | 0;
-
-    for (let currentX = leftX; currentX <= rightX; currentX++) {
-      for (let currentY = lowY; currentY <= highY; currentY++) {
-        const key = `${currentX}-${currentY}`;
-
-        if (gridMap.has(key)) {
-          gridMap.get(key)!.push(this);
-        } else {
-          gridMap.set(key, [this]);
-        }
-      }
-    }
   }
 
   isCollision = (other: Circle) => {
@@ -144,10 +105,14 @@ type CircleManagerConfig = {
 export class CircleManager {
   circleList: Circle[];
   config: CircleManagerConfig;
+  gridMap: Map<string, Circle[]>;
 
   constructor(config: CircleManagerConfig) {
     this.config = config;
     this.circleList = [];
+    this.gridMap = new Map();
+
+    this.initCirclePlace();
   }
   getCircleInfoList() {
     return this.circleList;
@@ -194,5 +159,80 @@ export class CircleManager {
     const color = `#${((Math.random() * maxColor) | 0).toString(16)}`;
 
     return { x, y, v, ang, color, r };
+  }
+
+  moveCircles() {
+    this.circleList.forEach((circle) => {
+      const nextPositionInfo = circle.getNextPositionInfo();
+      const checkResult = this.checkNextPosition(nextPositionInfo, circle);
+
+      if (checkResult === "x-axis") return circle.reflectXAxis();
+      if (checkResult === "y-axis") return circle.reflectYAxis();
+    });
+    this.gridMap.clear();
+    this.circleList.forEach((circle) => {
+      circle.move();
+      this.setGridMap(circle);
+    });
+  }
+
+  setGridMap(circle: Circle) {
+    const gridMap = this.gridMap;
+    const { leftX, rightX, lowY, highY } = circle.getPositionInfo();
+    const gridValue = this.config.gridValue;
+
+    const gridLeftX = (leftX / gridValue) | 0;
+    const gridRightX = (rightX / gridValue) | 0;
+    const gridLowY = (lowY / gridValue) | 0;
+    const gridHighY = (highY / gridValue) | 0;
+
+    for (let currentX = gridLeftX; currentX <= gridRightX; currentX++) {
+      for (let currentY = gridLowY; currentY <= gridHighY; currentY++) {
+        const key = `${currentX}-${currentY}`;
+
+        if (gridMap.has(key)) {
+          gridMap.get(key)!.push(circle);
+        } else {
+          gridMap.set(key, [circle]);
+        }
+      }
+    }
+  }
+
+  checkNextPosition(
+    { leftX, rightX, lowY, highY }: PositionInfo,
+    circle: Circle
+  ) {
+    const { height, width, gridValue } = this.config;
+
+    if (leftX <= 0 || rightX >= width) {
+      return "y-axis";
+    }
+    if (lowY <= 0 || highY >= height) {
+      return "x-axis";
+    }
+
+    const gridMap = this.gridMap;
+    const gridLeftX = (leftX / gridValue) | 0;
+    const gridRightX = (rightX / gridValue) | 0;
+    const gridLowY = (lowY / gridValue) | 0;
+    const gridHighY = (highY / gridValue) | 0;
+
+    for (let currentX = gridLeftX; currentX <= gridRightX; currentX++) {
+      for (let currentY = gridLowY; currentY <= gridHighY; currentY++) {
+        const grid = gridMap.get(`${currentX}-${currentY}`);
+
+        if (!grid) continue;
+
+        for (let k = 0; k < grid.length; k++) {
+          if (grid[k] === circle) continue;
+          if (circle.isCollision(grid[k])) {
+            return "y-axis";
+          }
+        }
+      }
+    }
+
+    return "none";
   }
 }
