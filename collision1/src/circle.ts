@@ -90,7 +90,7 @@ export class Circle {
   };
 }
 
-type CircleManagerConfig = {
+export type CircleManagerConfig = {
   circleCount: number;
   width: number;
   height: number;
