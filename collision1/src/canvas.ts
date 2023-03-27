@@ -1,4 +1,4 @@
-import { CircleInfo } from "./circle";
+import { CircleInfo, CircleManager } from "./circle";
 
 const DEGREE_180 = Math.PI;
 const DEGREE_360 = DEGREE_180 * 2;
@@ -15,8 +15,15 @@ type CanvasConfig = {
 export class Canvas {
   #config: CanvasConfig;
   #canvas: HTMLCanvasElement;
+  #circleManager: CircleManager;
+  #refNum: number = -1;
 
-  constructor({ element, height, width, posX, posY, bgColor }: CanvasConfig) {
+  constructor(
+    { element, height, width, posX, posY, bgColor }: CanvasConfig,
+    circleManager: CircleManager
+  ) {
+    this.#circleManager = circleManager;
+
     this.#config = {
       element,
       height,
@@ -60,5 +67,29 @@ export class Canvas {
     ctx.arc(x, y, r, 0, DEGREE_360);
     ctx.fillStyle = color;
     ctx.fill();
+  }
+
+  run = () => {
+    this.clear();
+    this.#circleManager.moveCircles();
+
+    this.#circleManager.circleList.forEach((circle) =>
+      this.renderCircle(circle.info)
+    );
+
+    this.#refNum = requestAnimationFrame(this.run);
+  };
+
+  stop() {
+    cancelAnimationFrame(this.#refNum);
+    this.#refNum = -1;
+  }
+
+  toggle() {
+    if (this.#refNum === -1) {
+      this.run();
+    } else {
+      this.stop();
+    }
   }
 }
