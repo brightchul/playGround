@@ -4,7 +4,7 @@ const DEGREE_180 = Math.PI;
 const DEGREE_360 = DEGREE_180 * 2;
 
 type CanvasConfig = {
-  element: HTMLElement;
+  id: string;
   height: number;
   width: number;
   posX: number;
@@ -14,24 +14,30 @@ type CanvasConfig = {
 
 export class Canvas {
   #config: CanvasConfig;
-  #canvas: HTMLCanvasElement;
+  #canvas?: HTMLCanvasElement;
   #circleManager: CircleManager;
   #refNum: number = -1;
 
   constructor(
-    { element, height, width, posX, posY, bgColor }: CanvasConfig,
+    { id, height, width, posX, posY, bgColor }: CanvasConfig,
     circleManager: CircleManager
   ) {
     this.#circleManager = circleManager;
 
     this.#config = {
-      element,
+      id,
       height,
       width,
       posX,
       posY,
       bgColor,
     };
+  }
+
+  init() {
+    if (this.#canvas) return;
+    const { id, height, width } = this.#config;
+    const element = document.getElementById(id)! as HTMLElement;
 
     const canvas = document.createElement("canvas");
     canvas.height = height;
@@ -43,13 +49,13 @@ export class Canvas {
   }
 
   get height() {
-    return this.#canvas.height;
+    return this.#canvas?.height;
   }
   get width() {
-    return this.#canvas.width;
+    return this.#canvas?.width;
   }
   get ctx() {
-    return this.#canvas.getContext("2d")!;
+    return this.#canvas?.getContext("2d")!;
   }
 
   clear() {
@@ -86,10 +92,6 @@ export class Canvas {
   }
 
   toggle() {
-    if (this.#refNum === -1) {
-      this.run();
-    } else {
-      this.stop();
-    }
+    this.#refNum === -1 ? this.run() : this.stop();
   }
 }

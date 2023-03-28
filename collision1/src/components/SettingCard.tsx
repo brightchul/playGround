@@ -1,8 +1,9 @@
 import { Button, Card, Form, Input, InputNumber } from "antd";
-import { useState } from "react";
-import { Control, Controller, FieldValues, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+
 import { CircleManagerConfig } from "../circle";
-import { Config, useCircleConfigStore } from "../stores/circleConfig";
+import { useCircleConfigStore } from "../stores/circleConfig";
 import SettingInput from "./SettingInput";
 
 type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
@@ -29,40 +30,50 @@ export default function SettingCard() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<Partial<CircleManagerConfig>>({ defaultValues: configs });
+  } = useForm<Partial<ConfigNamesKeysType>>({ defaultValues: configs });
 
   const [play, setPlay] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = (data: any) => {
     oneConfigs.managers.canvas.toggle();
     setPlay((prev) => !prev);
   };
 
-  return (
-    <Card title="Circle Setting" style={{ maxWidth: 300 }}>
-      <Form
-        labelCol={{ span: 12 }}
-        wrapperCol={{ span: 12 }}
-        layout="horizontal"
-        onFinish={handleSubmit(onSubmit)}
-      >
-        {configNamesEntries.map(([name, label]) => (
-          <SettingInput
-            key={`${name}-${label}`}
-            name={name}
-            label={label}
-            control={control}
-            defaultValue={configs[name]}
-            rules={{ required: true }}
-          />
-        ))}
+  useEffect(() => {
+    oneConfigs.managers.canvas.init();
+  }, []);
 
-        <Form.Item style={{ textAlign: "center" }}>
-          <Button type="primary" htmlType="submit">
-            {play === false ? "play" : "stop"}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+  return (
+    <div style={{ position: "relative" }}>
+      <Card
+        title="Circle Setting"
+        style={{ maxWidth: 300, position: "absolute" }}
+      >
+        <Form
+          labelCol={{ span: 12 }}
+          wrapperCol={{ span: 12 }}
+          layout="horizontal"
+          onFinish={handleSubmit(onSubmit)}
+        >
+          {configNamesEntries.map(([name, label]) => (
+            <SettingInput
+              key={`${name}-${label}`}
+              name={name}
+              label={label}
+              control={control}
+              defaultValue={configs[name]}
+              rules={{ required: true }}
+            />
+          ))}
+
+          <Form.Item style={{ textAlign: "center" }}>
+            <Button type="primary" htmlType="submit">
+              {play === false ? "play" : "stop"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <div id={oneConfigs.id}></div>
+    </div>
   );
 }

@@ -30,10 +30,11 @@ const initConfigState = {
   gridValue: 200,
 };
 
+const INIT_ID = nanoid();
 export const circleManager = new CircleManager(initConfigState);
 export const canvasManager = new Canvas(
   {
-    element: document.getElementById("container")!,
+    id: INIT_ID,
     height: initConfigState.height,
     width: initConfigState.width,
     posX: 0,
@@ -46,7 +47,7 @@ export const canvasManager = new Canvas(
 export const useCircleConfigStore = create<ConfigStore>()((set) => ({
   configs: [
     {
-      id: nanoid(),
+      id: INIT_ID,
       config: initConfigState,
       managers: {
         circles: circleManager,
@@ -59,7 +60,7 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
       const circles = new CircleManager({ ...newConfig, maxColor: FFF });
       const canvas = new Canvas(
         {
-          element: document.getElementById("container")!,
+          id: nanoid(),
           height: newConfig.height,
           width: newConfig.width,
           posX: 0,
