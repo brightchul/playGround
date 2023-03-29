@@ -90,7 +90,7 @@ export class Circle {
   };
 }
 
-type CircleManagerConfig = {
+export type CircleManagerConfig = {
   circleCount: number;
   width: number;
   height: number;
@@ -112,12 +112,15 @@ export class CircleManager {
     this.circleList = [];
     this.gridMap = new Map();
 
-    this.initCirclePlace();
+    this.initCircleList();
+  }
+  changeConfig(config: Partial<CircleManagerConfig>) {
+    this.config = { ...this.config, ...config };
   }
   getCircleInfoList() {
     return this.circleList;
   }
-  initCirclePlace() {
+  initCircleList() {
     const { circleCount, gridValue } = this.config;
 
     let tempList = [];
