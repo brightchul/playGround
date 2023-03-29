@@ -15,6 +15,9 @@ export interface Config {
 
 interface ConfigStore {
   configs: Config[];
+  addConfig: (newConfig: CircleConfig) => void;
+  removeConfig: (targetConfig: Config) => void;
+  updateConfig: (id: string, targetConfig: Partial<CircleConfig>) => void;
 }
 const FFF = 16777215;
 
@@ -55,7 +58,7 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
       },
     },
   ],
-  addConfig: (newConfig: CircleConfig) =>
+  addConfig: (newConfig) =>
     set((state) => {
       const circles = new CircleManager({ ...newConfig, maxColor: FFF });
       const canvas = new Canvas(
@@ -80,7 +83,24 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
         ],
       };
     }),
-  removeConfig: (targetConfig: Config) =>
+  updateConfig: (id, targetConfig) =>
+    set((state) => {
+      const prev = state.configs.find((config) => config.id === id);
+      if (prev) {
+        const targetKeys = Object.keys(
+          targetConfig
+        ) as (keyof Partial<CircleConfig>)[];
+
+        if (targetKeys.some((key) => prev.config[key] !== targetConfig[key])) {
+          prev.config = {
+            ...prev.config,
+            ...targetConfig,
+          };
+        }
+      }
+      return state;
+    }),
+  removeConfig: (targetConfig) =>
     set((state) => {
       targetConfig.managers.canvas.stop();
       return {

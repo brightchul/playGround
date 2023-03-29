@@ -24,6 +24,7 @@ const configNamesEntries = Object.entries(configNames) as ConfigNamesEntries;
 
 export default function SettingCard() {
   const oneConfigs = useCircleConfigStore((state) => state.configs)[0];
+  const updateConfig = useCircleConfigStore((state) => state.updateConfig);
   const configs = oneConfigs.config;
 
   const {
@@ -40,7 +41,12 @@ export default function SettingCard() {
     canvas.changeSize({ height: data.height, width: data.width });
     circles.changeConfig(data);
 
+    if (!play) {
+      circles.initCircleList();
+    }
     canvas.toggle();
+
+    updateConfig(oneConfigs.id, data);
     setPlay((prev) => !prev);
   };
 
