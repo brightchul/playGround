@@ -58,6 +58,15 @@ export class Canvas {
     return this.#canvas?.getContext("2d")!;
   }
 
+  changeSize({ height, width }: { height: number; width: number }) {
+    if (!this.#canvas) return;
+
+    this.#canvas.height = this.#config.height = height;
+    this.#canvas.width = this.#config.width = width;
+
+    this.renderCanvas();
+  }
+
   clear() {
     const ctx = this.ctx;
     const { posX, posY, width, height, bgColor } = this.#config;
@@ -75,13 +84,16 @@ export class Canvas {
     ctx.fill();
   }
 
-  run = () => {
+  renderCanvas() {
     this.clear();
-    this.#circleManager.moveCircles();
-
     this.#circleManager.circleList.forEach((circle) =>
       this.renderCircle(circle.info)
     );
+  }
+
+  run = () => {
+    this.#circleManager.moveCircles();
+    this.renderCanvas();
 
     this.#refNum = requestAnimationFrame(this.run);
   };

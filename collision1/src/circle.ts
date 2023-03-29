@@ -114,6 +114,9 @@ export class CircleManager {
 
     this.initCirclePlace();
   }
+  changeConfig(config: Partial<CircleManagerConfig>) {
+    this.config = { ...this.config, ...config };
+  }
   getCircleInfoList() {
     return this.circleList;
   }

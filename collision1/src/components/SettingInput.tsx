@@ -1,4 +1,4 @@
-import { Form, Input } from "antd";
+import { Form, InputNumber } from "antd";
 import { Control, FieldValues, Controller } from "react-hook-form";
 
 interface SettingNumberInputProps {
@@ -9,7 +9,7 @@ interface SettingNumberInputProps {
   defaultValue: any;
 }
 
-export default function SettingInput({
+export default function SettingInputNumber({
   control,
   label,
   name,
@@ -22,7 +22,9 @@ export default function SettingInput({
         name={name}
         control={control}
         rules={rules}
-        render={({ field }) => <Input {...field} defaultValue={defaultValue} />}
+        render={({ field }) => (
+          <InputNumber {...field} defaultValue={defaultValue} />
+        )}
       />
     </Form.Item>
   );

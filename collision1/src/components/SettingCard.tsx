@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { CircleManagerConfig } from "../circle";
 import { useCircleConfigStore } from "../stores/circleConfig";
-import SettingInput from "./SettingInput";
+import SettingInputNumber from "./SettingInput";
 
 type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
 type ConfigNames = Record<keyof ConfigNamesKeysType, string>;
@@ -34,8 +34,13 @@ export default function SettingCard() {
 
   const [play, setPlay] = useState(false);
 
-  const onSubmit = (data: any) => {
-    oneConfigs.managers.canvas.toggle();
+  const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
+    const { canvas, circles } = oneConfigs.managers;
+    if (!data.height || !data.width) return;
+    canvas.changeSize({ height: data.height, width: data.width });
+    circles.changeConfig(data);
+
+    canvas.toggle();
     setPlay((prev) => !prev);
   };
 
@@ -56,7 +61,7 @@ export default function SettingCard() {
           onFinish={handleSubmit(onSubmit)}
         >
           {configNamesEntries.map(([name, label]) => (
-            <SettingInput
+            <SettingInputNumber
               key={`${name}-${label}`}
               name={name}
               label={label}
