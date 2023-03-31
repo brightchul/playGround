@@ -2,8 +2,9 @@ import { Button, Card, Form, Input, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { CircleManagerConfig } from "../circle";
-import { useCircleConfigStore } from "../stores/circleConfig";
+import { CircleManagerConfig } from "../../circle";
+import { useCircleConfigStore } from "../../stores/circleConfig";
+import CircleArea from "../CircleArea/CircleArea";
 import SettingInputNumber from "./SettingInput";
 
 type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
@@ -85,6 +86,14 @@ export default function SettingCard() {
         </Form>
       </Card>
       <div id={oneConfigs.id}></div>
+      <CircleArea
+        id={oneConfigs.id}
+        height={configs.height}
+        width={configs.width}
+        bgColor="#eee"
+        circleManager={oneConfigs.managers.circles}
+        isPlay={play}
+      />
     </div>
   );
 }
