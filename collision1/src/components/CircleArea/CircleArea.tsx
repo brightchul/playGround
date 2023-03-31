@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
+
 import { CircleManager } from "../../circle";
 import useCircleArea from "./useCircleArea";
 
@@ -10,15 +11,15 @@ export interface CircleAreaProps {
   posY?: number;
   bgColor: string;
   circleManager: CircleManager;
-  isPlay?: boolean;
+  isPlay: boolean;
 }
 
-function CircleArea(props: CircleAreaProps) {
+function CircleArea({ isPlay, ...props }: CircleAreaProps) {
   const { canvasRef, toggleAnimation } = useCircleArea(props);
 
   useEffect(() => {
-    toggleAnimation();
-  }, [props.isPlay]);
+    toggleAnimation(isPlay);
+  }, [isPlay]);
 
   return (
     <div id={props.id}>

@@ -1,5 +1,5 @@
 import { Button, Card, Form, Input, InputNumber } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { CircleManagerConfig } from "../../circle";
@@ -37,23 +37,18 @@ export default function SettingCard() {
   const [play, setPlay] = useState(false);
 
   const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
-    const { canvas, circles } = oneConfigs.managers;
     if (!data.height || !data.width) return;
-    canvas.changeSize({ height: data.height, width: data.width });
+
+    const { circles } = oneConfigs.managers;
     circles.changeConfig(data);
 
     if (!play) {
       circles.initCircleList();
     }
-    canvas.toggle();
 
     updateConfig(oneConfigs.id, data);
     setPlay((prev) => !prev);
   };
-
-  useEffect(() => {
-    oneConfigs.managers.canvas.init();
-  }, []);
 
   return (
     <div style={{ position: "relative" }}>
@@ -85,7 +80,6 @@ export default function SettingCard() {
           </Form.Item>
         </Form>
       </Card>
-      <div id={oneConfigs.id}></div>
       <CircleArea
         id={oneConfigs.id}
         height={configs.height}

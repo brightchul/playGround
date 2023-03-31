@@ -71,11 +71,10 @@ export default function useCircleArea({
 
   const stopAnimation = () => {
     cancelAnimationFrame(rafRef.current);
-    rafRef.current = RAF_NONE;
   };
 
-  const toggleAnimation = () => {
-    if (rafRef.current === RAF_NONE) {
+  const toggleAnimation = (isPlay: boolean) => {
+    if (isPlay) {
       runAnimation();
     } else {
       stopAnimation();
