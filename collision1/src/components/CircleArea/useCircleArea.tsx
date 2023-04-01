@@ -7,7 +7,7 @@ const DEGREE_180 = Math.PI;
 const DEGREE_360 = DEGREE_180 * 2;
 const RAF_NONE = -1;
 
-interface UseCircleAreaProps extends CircleAreaProps {}
+interface UseCircleAreaProps extends Omit<CircleAreaProps, "isPlay"> {}
 
 export default function useCircleArea({
   height,
