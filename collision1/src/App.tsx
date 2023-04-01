@@ -1,11 +1,9 @@
-import { Button, DatePicker, Space, version } from "antd";
-import { useState } from "react";
-import SettingCard from "./components/SettingCard";
+import CircleCollisionSection from "./components/CircleCollisionSection";
 
 function App() {
   return (
     <div>
-      <SettingCard />
+      <CircleCollisionSection />
     </div>
   );
 }
