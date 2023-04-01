@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 
 import { CircleManagerConfig } from "../../circle";
 import { useCircleConfigStore } from "../../stores/circleConfig";
-import CircleArea from "../CircleArea/CircleArea";
 import SettingInputNumber from "./SettingInput";
 
 type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
@@ -23,7 +22,12 @@ const configNames: ConfigNames = {
 
 const configNamesEntries = Object.entries(configNames) as ConfigNamesEntries;
 
-export default function SettingCard() {
+interface SettingCardProps {
+  togglePlay: () => void;
+  isPlay: boolean;
+}
+
+export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
   const oneConfigs = useCircleConfigStore((state) => state.configs)[0];
   const updateConfig = useCircleConfigStore((state) => state.updateConfig);
   const configs = oneConfigs.config;
@@ -34,60 +38,48 @@ export default function SettingCard() {
     formState: { errors },
   } = useForm<Partial<ConfigNamesKeysType>>({ defaultValues: configs });
 
-  const [play, setPlay] = useState(false);
-
   const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
     if (!data.height || !data.width) return;
 
     const { circles } = oneConfigs.managers;
     circles.changeConfig(data);
 
-    if (!play) {
+    if (!isPlay) {
       circles.initCircleList();
     }
 
     updateConfig(oneConfigs.id, data);
-    setPlay((prev) => !prev);
+    togglePlay();
   };
 
   return (
-    <div style={{ position: "relative" }}>
-      <Card
-        title="Circle Setting"
-        style={{ maxWidth: 300, position: "absolute" }}
+    <Card
+      title="Circle Setting"
+      style={{ maxWidth: 300, position: "absolute" }}
+    >
+      <Form
+        labelCol={{ span: 12 }}
+        wrapperCol={{ span: 12 }}
+        layout="horizontal"
+        onFinish={handleSubmit(onSubmit)}
       >
-        <Form
-          labelCol={{ span: 12 }}
-          wrapperCol={{ span: 12 }}
-          layout="horizontal"
-          onFinish={handleSubmit(onSubmit)}
-        >
-          {configNamesEntries.map(([name, label]) => (
-            <SettingInputNumber
-              key={`${name}-${label}`}
-              name={name}
-              label={label}
-              control={control}
-              defaultValue={configs[name]}
-              rules={{ required: true }}
-            />
-          ))}
+        {configNamesEntries.map(([name, label]) => (
+          <SettingInputNumber
+            key={`${name}-${label}`}
+            name={name}
+            label={label}
+            control={control}
+            defaultValue={configs[name]}
+            rules={{ required: true }}
+          />
+        ))}
 
-          <Form.Item style={{ textAlign: "center" }}>
-            <Button type="primary" htmlType="submit">
-              {play === false ? "play" : "stop"}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-      <CircleArea
-        id={oneConfigs.id}
-        height={configs.height}
-        width={configs.width}
-        bgColor="#eee"
-        circleManager={oneConfigs.managers.circles}
-        isPlay={play}
-      />
-    </div>
+        <Form.Item style={{ textAlign: "center" }}>
+          <Button type="primary" htmlType="submit">
+            {isPlay === false ? "play" : "stop"}
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 }
