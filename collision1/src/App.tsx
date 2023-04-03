@@ -1,9 +1,9 @@
-import CircleCollisionSection from "./components/CircleCollisionSection";
+import CircleCollisionPage from "./pages/CircleCollision";
 
 function App() {
   return (
     <div>
-      <CircleCollisionSection />
+      <CircleCollisionPage />
     </div>
   );
 }

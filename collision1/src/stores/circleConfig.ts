@@ -85,3 +85,9 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
       };
     }),
 }));
+
+export const selectConfigsById = (id: string) => (state: ConfigStore) =>
+  state.configs.find((config) => config.id === id);
+
+export const selectConfigIdArr = (state: ConfigStore) =>
+  state.configs.map((config) => config.id);

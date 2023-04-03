@@ -1,26 +1,12 @@
-import { Button, Card, Form, Input, InputNumber } from "antd";
-import { useState } from "react";
+import { Button, Card, Form } from "antd";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { CircleManagerConfig } from "../../circle";
 import { useCircleConfigStore } from "../../stores/circleConfig";
+import { configNamesEntries } from "./constants";
 import SettingInputNumber from "./SettingInput";
-
-type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
-type ConfigNames = Record<keyof ConfigNamesKeysType, string>;
-type ConfigNamesEntries = [keyof ConfigNames, string][];
-
-const configNames: ConfigNames = {
-  circleCount: "circle 개수",
-  width: "캔버스 가로",
-  height: "캔버스 세로",
-  vVariable: "속도 구간",
-  vMin: "최저 속도",
-  radiusMax: "circle 최대 지름",
-  radiusMin: "circle 최소 지름",
-};
-
-const configNamesEntries = Object.entries(configNames) as ConfigNamesEntries;
+import { ConfigNamesKeysType } from "./types";
+import { useSettingCardValidation } from "./validations";
 
 interface SettingCardProps {
   togglePlay: () => void;
@@ -28,29 +14,33 @@ interface SettingCardProps {
 }
 
 export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
-  const oneConfigs = useCircleConfigStore((state) => state.configs)[0];
+  const { id, config, managers } = useCircleConfigStore(
+    (state) => state.configs
+  )[0];
+
   const updateConfig = useCircleConfigStore((state) => state.updateConfig);
-  const configs = oneConfigs.config;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Partial<ConfigNamesKeysType>>({ defaultValues: configs });
+  const { control, handleSubmit, formState } = useForm<ConfigNamesKeysType>({
+    defaultValues: config,
+  });
 
-  const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
-    if (!data.height || !data.width) return;
+  const validationRules = useSettingCardValidation(config);
 
-    const { circles } = oneConfigs.managers;
+  const onSubmit = (data: ConfigNamesKeysType) => {
+    const { circles } = managers;
     circles.changeConfig(data);
 
     if (!isPlay) {
       circles.initCircleList();
     }
 
-    updateConfig(oneConfigs.id, data);
+    updateConfig(id, data);
     togglePlay();
   };
+
+  useEffect(() => {
+    handleSubmit(onSubmit)();
+  }, []);
 
   return (
     <Card
@@ -69,13 +59,17 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
             name={name}
             label={label}
             control={control}
-            defaultValue={configs[name]}
-            rules={{ required: true }}
+            defaultValue={config[name]}
+            rules={validationRules[name]}
           />
         ))}
 
         <Form.Item style={{ textAlign: "center" }}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={!formState.isValid}
+          >
             {isPlay === false ? "play" : "stop"}
           </Button>
         </Form.Item>
