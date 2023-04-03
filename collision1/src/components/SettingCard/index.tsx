@@ -1,26 +1,11 @@
-import { Button, Card, Form, Input, InputNumber } from "antd";
-import { useState } from "react";
+import { Button, Card, Form } from "antd";
 import { useForm } from "react-hook-form";
 
-import { CircleManagerConfig } from "../../circle";
 import { useCircleConfigStore } from "../../stores/circleConfig";
+import { configNamesEntries } from "./constants";
 import SettingInputNumber from "./SettingInput";
-
-type ConfigNamesKeysType = Omit<CircleManagerConfig, "maxColor" | "gridValue">;
-type ConfigNames = Record<keyof ConfigNamesKeysType, string>;
-type ConfigNamesEntries = [keyof ConfigNames, string][];
-
-const configNames: ConfigNames = {
-  circleCount: "circle 개수",
-  width: "캔버스 가로",
-  height: "캔버스 세로",
-  vVariable: "속도 구간",
-  vMin: "최저 속도",
-  radiusMax: "circle 최대 지름",
-  radiusMin: "circle 최소 지름",
-};
-
-const configNamesEntries = Object.entries(configNames) as ConfigNamesEntries;
+import { ConfigNamesKeysType } from "./types";
+import { useSettingCardValidation } from "./validations";
 
 interface SettingCardProps {
   togglePlay: () => void;
@@ -37,6 +22,8 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<Partial<ConfigNamesKeysType>>({ defaultValues: configs });
+
+  const validationRules = useSettingCardValidation(configs);
 
   const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
     if (!data.height || !data.width) return;
@@ -70,7 +57,7 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
             label={label}
             control={control}
             defaultValue={configs[name]}
-            rules={{ required: true }}
+            rules={validationRules[name]}
           />
         ))}
 
