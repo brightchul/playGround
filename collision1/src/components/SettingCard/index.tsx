@@ -1,4 +1,5 @@
 import { Button, Card, Form } from "antd";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { useCircleConfigStore } from "../../stores/circleConfig";
@@ -13,31 +14,33 @@ interface SettingCardProps {
 }
 
 export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
-  const oneConfigs = useCircleConfigStore((state) => state.configs)[0];
+  const { id, config, managers } = useCircleConfigStore(
+    (state) => state.configs
+  )[0];
+
   const updateConfig = useCircleConfigStore((state) => state.updateConfig);
-  const configs = oneConfigs.config;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Partial<ConfigNamesKeysType>>({ defaultValues: configs });
+  const { control, handleSubmit, formState } = useForm<ConfigNamesKeysType>({
+    defaultValues: config,
+  });
 
-  const validationRules = useSettingCardValidation(configs);
+  const validationRules = useSettingCardValidation(config);
 
-  const onSubmit = (data: Partial<ConfigNamesKeysType>) => {
-    if (!data.height || !data.width) return;
-
-    const { circles } = oneConfigs.managers;
+  const onSubmit = (data: ConfigNamesKeysType) => {
+    const { circles } = managers;
     circles.changeConfig(data);
 
     if (!isPlay) {
       circles.initCircleList();
     }
 
-    updateConfig(oneConfigs.id, data);
+    updateConfig(id, data);
     togglePlay();
   };
+
+  useEffect(() => {
+    handleSubmit(onSubmit)();
+  }, []);
 
   return (
     <Card
@@ -56,13 +59,17 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
             name={name}
             label={label}
             control={control}
-            defaultValue={configs[name]}
+            defaultValue={config[name]}
             rules={validationRules[name]}
           />
         ))}
 
         <Form.Item style={{ textAlign: "center" }}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={!formState.isValid}
+          >
             {isPlay === false ? "play" : "stop"}
           </Button>
         </Form.Item>

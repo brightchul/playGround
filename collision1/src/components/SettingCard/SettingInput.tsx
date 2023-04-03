@@ -1,31 +1,42 @@
 import { Form, InputNumber } from "antd";
-import { Control, FieldValues, Controller } from "react-hook-form";
+import {
+  Control,
+  FieldPath,
+  FieldValues,
+  useController,
+} from "react-hook-form";
 
-interface SettingNumberInputProps {
-  control: Control<FieldValues, any>;
+interface SettingNumberInputProps<T extends FieldValues> {
+  control: Control<T>;
   label: string;
-  name: string;
+  name: FieldPath<T>;
   rules: any;
   defaultValue: any;
 }
 
-export default function SettingInputNumber({
+export default function SettingInputNumber<T extends FieldValues>({
   control,
   label,
   name,
   rules,
   defaultValue,
-}: SettingNumberInputProps) {
+}: SettingNumberInputProps<T>) {
+  const {
+    field,
+    formState: { errors },
+  } = useController({
+    name,
+    defaultValue,
+    control,
+    rules,
+  });
+
   return (
     <Form.Item label={label} name={name}>
-      <Controller
-        name={name}
-        control={control}
-        rules={rules}
-        render={({ field }) => (
-          <InputNumber {...field} defaultValue={defaultValue} />
-        )}
-      />
+      <>
+        <InputNumber {...field} />
+        {errors[name] && <p>{errors[name]?.message?.toString()}</p>}
+      </>
     </Form.Item>
   );
 }

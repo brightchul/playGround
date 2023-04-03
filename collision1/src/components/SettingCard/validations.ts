@@ -14,7 +14,7 @@ export const min = (minValue: number) => (v: number) => {
   if (v < minValue) return `${minValue} 이상의 값이어야 합니다.`;
 };
 
-export function useSettingCardValidation(configs: CircleManagerConfig) {
+export function useSettingCardValidation(config: CircleManagerConfig) {
   const validationRules = useMemo(
     () => ({
       circleCount: {
@@ -52,17 +52,17 @@ export function useSettingCardValidation(configs: CircleManagerConfig) {
         validate: {
           required,
           positive,
-          max: max(configs.radiusMax),
+          max: max(config.radiusMax),
         },
       },
       radiusMax: {
         validate: {
           required,
-          min: min(configs.radiusMin),
+          min: min(config.radiusMin),
         },
       },
     }),
-    [configs]
+    [config]
   );
 
   return validationRules;
