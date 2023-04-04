@@ -20,9 +20,9 @@ interface ConfigStore {
 const FFF = 16777215;
 
 const initConfigState = {
-  circleCount: 7000,
-  width: 2000,
-  height: 1000,
+  circleCount: 1000,
+  width: 700,
+  height: 500,
   vVariable: 5,
   vMin: 1,
   maxColor: FFF,
