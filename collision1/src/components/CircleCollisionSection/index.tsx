@@ -18,7 +18,7 @@ export default function CircleCollisionSection({
   const [isPlay, togglePlay] = useToggle();
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="relative">
       <SettingCard isPlay={isPlay} togglePlay={togglePlay} />
       <CircleArea
         id={id}
