@@ -1,4 +1,3 @@
-import { Button, Card, Form } from "antd";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -43,16 +42,11 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
   }, []);
 
   return (
-    <Card
-      title="Circle Setting"
+    <div
+      className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 "
       style={{ maxWidth: 300, position: "absolute" }}
     >
-      <Form
-        labelCol={{ span: 12 }}
-        wrapperCol={{ span: 12 }}
-        layout="horizontal"
-        onFinish={handleSubmit(onSubmit)}
-      >
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
         {configNamesEntries.map(([name, label]) => (
           <SettingInputNumber
             key={`${name}-${label}`}
@@ -64,16 +58,15 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
           />
         ))}
 
-        <Form.Item style={{ textAlign: "center" }}>
-          <Button
-            type="primary"
-            htmlType="submit"
+        <div>
+          <button
+            className="mt-5 w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             disabled={!formState.isValid}
           >
             {isPlay === false ? "play" : "stop"}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
