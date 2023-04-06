@@ -43,6 +43,7 @@ export default function SettingInputNumber<T extends FieldValues>({
           className="w-6/12 block bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1"
           type="number"
           {...field}
+          onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
         />
       </p>
       {errors[name] && (

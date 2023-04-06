@@ -14,11 +14,16 @@ export const min = (minValue: number) => (v: number) => {
   if (v < minValue) return `${minValue} 이상의 값이어야 합니다.`;
 };
 
+export const isNumber = (v: any) => {
+  if (Number.isNaN(v)) return `숫자값만 가능합니다.`;
+};
+
 export function useSettingCardValidation(config: CircleManagerConfig) {
   const validationRules = useMemo(
     () => ({
       circleCount: {
         validate: {
+          isNumber,
           required,
           positive,
           max: max(10_000),
@@ -26,30 +31,35 @@ export function useSettingCardValidation(config: CircleManagerConfig) {
       },
       width: {
         validate: {
+          isNumber,
           required,
           min: min(100),
         },
       },
       height: {
         validate: {
+          isNumber,
           required,
           min: min(100),
         },
       },
       vVariable: {
         validate: {
+          isNumber,
           required,
           min: min(0),
         },
       },
       vMin: {
         validate: {
+          isNumber,
           required,
           min: min(1),
         },
       },
       radiusMin: {
         validate: {
+          isNumber,
           required,
           positive,
           max: max(config.radiusMax),
@@ -57,6 +67,7 @@ export function useSettingCardValidation(config: CircleManagerConfig) {
       },
       radiusMax: {
         validate: {
+          isNumber,
           required,
           min: min(config.radiusMin),
         },
