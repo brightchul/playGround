@@ -1,21 +1,32 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { useCircleConfigStore } from "../../stores/circleConfig";
+import {
+  selectConfigsById,
+  useCircleConfigStore,
+} from "../../stores/circleConfig";
 import { configNamesEntries } from "./constants";
 import SettingInputNumber from "./SettingInput";
 import { ConfigNamesKeysType } from "./types";
 import { useSettingCardValidation } from "./validations";
 
 interface SettingCardProps {
+  id: string;
+  wrapperClassName?: string;
   togglePlay: () => void;
   isPlay: boolean;
 }
 
-export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
-  const { id, config, managers } = useCircleConfigStore(
-    (state) => state.configs
-  )[0];
+export default function SettingCard({
+  id,
+  wrapperClassName,
+  isPlay,
+  togglePlay,
+}: SettingCardProps) {
+  const {
+    managers: { circles },
+    config,
+  } = useCircleConfigStore(selectConfigsById(id))!;
 
   const updateConfig = useCircleConfigStore((state) => state.updateConfig);
 
@@ -26,7 +37,6 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
   const validationRules = useSettingCardValidation(config);
 
   const onSubmit = (data: ConfigNamesKeysType) => {
-    const { circles } = managers;
     circles.changeConfig(data);
 
     if (!isPlay) {
@@ -43,8 +53,7 @@ export default function SettingCard({ isPlay, togglePlay }: SettingCardProps) {
 
   return (
     <div
-      className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 "
-      style={{ maxWidth: 300, position: "absolute" }}
+      className={`w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 ${wrapperClassName}`}
     >
       <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
         {configNamesEntries.map(([name, label]) => (
