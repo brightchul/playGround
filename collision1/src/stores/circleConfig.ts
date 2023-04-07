@@ -31,6 +31,10 @@ const initConfigState = {
   gridValue: 200,
 };
 
+export const generateInitConfigState = () => {
+  return initConfigState;
+};
+
 const INIT_ID = nanoid();
 export const circleManager = new CircleManager(initConfigState);
 
@@ -38,7 +42,7 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
   configs: [
     {
       id: INIT_ID,
-      config: initConfigState,
+      config: generateInitConfigState(),
       managers: {
         circles: circleManager,
       },
