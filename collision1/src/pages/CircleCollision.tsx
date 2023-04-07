@@ -1,4 +1,5 @@
 import CircleCollisionSection from "../components/CircleCollisionSection";
+import NewSettingSection from "../components/NewSettingSection";
 import {
   selectConfigIdArr,
   useCircleConfigStore,
@@ -9,9 +10,12 @@ export default function CircleCollision() {
 
   return (
     <div>
-      {ids.map((id) => (
-        <CircleCollisionSection key={id} id={id} />
-      ))}
+      <NewSettingSection />
+      <div>
+        {ids.map((id) => (
+          <CircleCollisionSection key={id} id={id} />
+        ))}
+      </div>
     </div>
   );
 }
