@@ -11,7 +11,7 @@ export default function CircleCollision() {
   return (
     <div>
       <NewSettingSection />
-      <div>
+      <div className="mt-5 flex flex-wrap gap-5 w-full">
         {ids.map((id) => (
           <CircleCollisionSection key={id} id={id} />
         ))}

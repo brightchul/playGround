@@ -5,7 +5,6 @@ import {
   generateInitConfigState,
   useCircleConfigStore,
 } from "../../stores/circleConfig";
-import SettingCard from "../SettingCard";
 import { configNamesEntries } from "../SettingCard/constants";
 import SettingInputNumber from "../SettingCard/SettingInput";
 import { ConfigNamesKeysType } from "../SettingCard/types";
@@ -31,9 +30,9 @@ export default function NewSettingSection() {
   }, []);
 
   return (
-    <div>
+    <div className="max-w-6xl p-5 border border-gray-200 rounded-lg">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-wrap gap-3  justify-start">
+        <div className="flex flex-wrap gap-3">
           {configNamesEntries.map(([name, label]) => (
             <SettingInputNumber
               wrapperClassName={"basis-52"}
@@ -46,7 +45,7 @@ export default function NewSettingSection() {
             />
           ))}
         </div>
-        <div className="text-center p-5">
+        <div className="text-center mt-5">
           <button
             className="inline-flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             disabled={!formState.isValid}
