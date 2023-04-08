@@ -29,6 +29,7 @@ export default function SettingCard({
   } = useCircleConfigStore(selectConfigsById(id))!;
 
   const updateConfig = useCircleConfigStore((state) => state.updateConfig);
+  const removeConfig = useCircleConfigStore((state) => state.removeConfig);
 
   const { control, handleSubmit, formState } = useForm<ConfigNamesKeysType>({
     defaultValues: config,
@@ -67,12 +68,20 @@ export default function SettingCard({
           />
         ))}
 
-        <div>
+        <div className="flex gap-3">
           <button
             className="mt-5 w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             disabled={!formState.isValid}
           >
             {isPlay === false ? "play" : "stop"}
+          </button>
+          <button
+            type="button"
+            onClick={() => removeConfig(id)}
+            className="mt-5 w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            disabled={!formState.isValid}
+          >
+            remove
           </button>
         </div>
       </form>
