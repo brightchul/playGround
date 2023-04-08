@@ -14,7 +14,7 @@ export interface Config {
 interface ConfigStore {
   configs: Config[];
   addConfig: (newConfig: CircleConfig) => void;
-  removeConfig: (targetConfig: Config) => void;
+  removeConfig: (id: string) => void;
   updateConfig: (id: string, targetConfig: Partial<CircleConfig>) => void;
 }
 const FFF = 16777215;
@@ -31,6 +31,10 @@ const initConfigState = {
   gridValue: 200,
 };
 
+export const generateInitConfigState = () => {
+  return initConfigState;
+};
+
 const INIT_ID = nanoid();
 export const circleManager = new CircleManager(initConfigState);
 
@@ -38,7 +42,7 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
   configs: [
     {
       id: INIT_ID,
-      config: initConfigState,
+      config: generateInitConfigState(),
       managers: {
         circles: circleManager,
       },
@@ -76,12 +80,10 @@ export const useCircleConfigStore = create<ConfigStore>()((set) => ({
       }
       return state;
     }),
-  removeConfig: (targetConfig) =>
+  removeConfig: (id) =>
     set((state) => {
       return {
-        configs: state.configs.filter(
-          (config) => config.id !== targetConfig.id
-        ),
+        configs: state.configs.filter((config) => config.id !== id),
       };
     }),
 }));

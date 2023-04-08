@@ -19,7 +19,12 @@ export default function CircleCollisionSection({
 
   return (
     <div className="relative">
-      <SettingCard isPlay={isPlay} togglePlay={togglePlay} />
+      <SettingCard
+        wrapperClassName="absolute max-w-xs"
+        id={id}
+        isPlay={isPlay}
+        togglePlay={togglePlay}
+      />
       <CircleArea
         id={id}
         height={config.height}

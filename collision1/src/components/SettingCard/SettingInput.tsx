@@ -6,6 +6,7 @@ import {
 } from "react-hook-form";
 
 interface SettingNumberInputProps<T extends FieldValues> {
+  wrapperClassName?: string;
   control: Control<T>;
   label: string;
   name: FieldPath<T>;
@@ -14,6 +15,7 @@ interface SettingNumberInputProps<T extends FieldValues> {
 }
 
 export default function SettingInputNumber<T extends FieldValues>({
+  wrapperClassName,
   control,
   label,
   name,
@@ -31,7 +33,7 @@ export default function SettingInputNumber<T extends FieldValues>({
   });
 
   return (
-    <div>
+    <div className={wrapperClassName}>
       <p className="flex items-center">
         <label
           className="w-6/12 block text-sm font-medium text-gray-900"
