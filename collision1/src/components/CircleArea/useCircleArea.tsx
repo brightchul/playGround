@@ -57,15 +57,8 @@ export default function useCircleArea({
     canvasCtx.fillRect(posX, posY, width, height);
   };
 
-  const renderCanvas = () => {
-    clearCanvas();
-    circleManager.circleList.forEach((circle) => renderCircle(circle.info));
-  };
-
   const runAnimation = () => {
-    circleManager.moveCircles();
-    renderCanvas();
-
+    circleManager.moveCircles(clearCanvas, renderCircle);
     rafRef.current = requestAnimationFrame(runAnimation);
   };
 
