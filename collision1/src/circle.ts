@@ -113,7 +113,7 @@ export class CircleManager {
     return { x, y, v, ang, color, r };
   }
 
-  async moveCircles(canvasClear: any, canvasRender: (circle: any) => void) {
+  moveCircles(canvasClear: any, canvasRender: (circle: any) => void) {
     this.worker.postMessage(this.circleList);
 
     this.worker.onmessage = ({ data }) => {
@@ -123,5 +123,9 @@ export class CircleManager {
         canvasRender(one);
       });
     };
+  }
+
+  terminateWorker() {
+    this.worker.terminate();
   }
 }
