@@ -14,10 +14,21 @@ const NONE = "none";
 const X_AXIS = "x-axis";
 const Y_AXIS = "y-axis";
 
-onmessage = (event) => {
-  const nextCircleList = run(event.data);
+onmessage = ({ data }) => {
+  settingConfig(data);
+  const nextCircleList = run(data.circleList);
   postMessage(nextCircleList);
 };
+
+function settingConfig(data: {
+  height: number;
+  width: number;
+  gridValue: number;
+}) {
+  height = data.height;
+  width = data.width;
+  gridValue = data.gridValue;
+}
 
 function run(circleList: CircleList) {
   const nextCircleList = circleList.map((circle) => {
@@ -157,3 +168,5 @@ function isCollision(circle1: Circle, circle2: Circle) {
     (circle1.r + circle2.r) ** 2
   );
 }
+
+export type {};

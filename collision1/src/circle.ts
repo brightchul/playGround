@@ -113,8 +113,14 @@ export class CircleManager {
     return { x, y, v, ang, color, r };
   }
 
-  moveCircles(canvasClear: any, canvasRender: (circle: any) => void) {
-    this.worker.postMessage(this.circleList);
+  moveCircles(canvasClear: () => void, canvasRender: (circle: any) => void) {
+    const { height, width, gridValue } = this.config;
+    this.worker.postMessage({
+      height,
+      width,
+      gridValue,
+      circleList: this.circleList,
+    });
 
     this.worker.onmessage = ({ data }) => {
       canvasClear();
