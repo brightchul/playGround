@@ -51,7 +51,7 @@ export default function SettingCard({
   };
 
   useEffect(() => {
-    handleSubmit(onSubmit)();
+    handleSubmit(() => {})();
   }, []);
 
   const [isFold, toggleFold] = useToggle(false);
