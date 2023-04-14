@@ -1,3 +1,5 @@
+import CollisionWorker from "./worker/worker1.ts?worker";
+
 export type CircleInfo = {
   x: number;
   y: number;
@@ -49,7 +51,7 @@ export class CircleManager {
     this.gridMap = new Map();
 
     this.initCircleList();
-    this.worker = new Worker(new URL("./worker/worker1.ts", import.meta.url));
+    this.worker = new CollisionWorker();
   }
   changeConfig(config: Partial<CircleManagerConfig>) {
     this.config = { ...this.config, ...config };
